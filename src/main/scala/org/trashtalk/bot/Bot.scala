@@ -9,8 +9,6 @@ import com.bot4s.telegram.methods.*
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import sttp.client3.SttpBackend
 
-import scala.language.postfixOps
-
 class Bot[F[_]: Async](token: String, backend: SttpBackend[F, Any])
     extends TelegramBot[F](token, backend),
       Polling[F]:
