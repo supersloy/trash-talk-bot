@@ -21,6 +21,6 @@ lazy val trashtalkBot = project
       "org.http4s"    %% "http4s-circe"        % Http4sVersion,
       "org.typelevel" %% "cats-effect"         % CatsVersion,
       "org.typelevel" %% "log4cats-slf4j"      % Log4CatsVersion,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.4.1"
-    ).map(_.cross(CrossVersion.for3Use2_13))
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.4.1",
+    ).map(_.cross(CrossVersion.for3Use2_13)),
   )
