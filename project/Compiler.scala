@@ -13,8 +13,6 @@ object Compiler {
      * explicitly. */
     "-unchecked", // Enable additional warnings where generated code depends on assumptions.
     "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-    "-Ykind-projector", // enable kind project syntax
-    "-source:future",   // enable better-monadic-for semantics
   )
 
   val settings = Seq(
