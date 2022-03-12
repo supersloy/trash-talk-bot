@@ -11,6 +11,8 @@ import com.bot4s.telegram.models.Message
 import org.trashtalk.bot.Schemas.MsgType.STICKER
 import shapeless.{::, HNil}
 import Fragments.values
+import doobie.postgres._
+import doobie.postgres.implicits._
 
 object Schemas {
 
@@ -18,19 +20,30 @@ object Schemas {
 
   object MsgType {
     case object TEXT extends MsgType
-
     case object IMAGE extends MsgType
-
     case object STICKER extends MsgType
-
     case object GIF extends MsgType
+
+    val msg_types = List(TEXT, IMAGE, STICKER, GIF)
+    def toEnum(e: MsgType): String = e.toString
+
+    def fromEnum(s: String): Option[MsgType] = s match {
+      case "TEXT" => Some(TEXT)
+      case "IMAGE" => Some(IMAGE)
+      case "STICKER" => Some(STICKER)
+      case "GIF" => Some(GIF)
+
+      case _ => None
+    }
+
+    implicit val msgTypeMeta: Meta[MsgType] =
+      pgEnumStringOpt("myenum", MsgType.fromEnum, MsgType.toEnum)
   }
 
 
   import MsgType._
 
   val msg_table_name = "message"
-  val msg_types = List(TEXT, IMAGE, STICKER, GIF)
 
   val chat =
     sql"""
@@ -47,8 +60,8 @@ object Schemas {
       fr"""(
           |"chat_id" bigint REFERENCES "chat"("chat_id"),
           |"message_id" bigint NOT NULL,
-          |"content" text NOT NULL,
           |"type" msg_type NOT NULL,
+          |"content" text NOT NULL,
           |PRIMARY KEY (message_id, chat_id)
           |);
       """.stripMargin
@@ -102,6 +115,14 @@ object SQLCommands {
     message
     ++ admin ++ admin_relation
     ).update.run
+
+  def getRandomMessage(source_id : Long) =
+    sql"""
+      SELECT chat_id, message_id, type, content FROM message
+      WHERE chat_id = $source_id
+      ORDER BY RANDOM()
+      LIMIT 1
+       """.query[DBMessage].to[List]
 
   // https://tpolecat.github.io/doobie/docs/07-Updating.html
   def insertMessage(msg: Message): ConnectionIO[Unit] = {
