@@ -27,7 +27,7 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
       githubWorkflowGeneratedCacheSteps.value ++
       List(
         WorkflowStep.Sbt(List("scalafmtCheckAll")),
-        WorkflowStep.Sbt(List("scalafmtCheckSbt")),
+        WorkflowStep.Sbt(List("scalafmtSbtCheck")),
       ),
   ),
   WorkflowJob(

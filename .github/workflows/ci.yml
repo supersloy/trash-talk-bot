@@ -98,7 +98,7 @@ jobs:
 
       - run: sbt ++${{ matrix.scala }} scalafmtCheckAll
 
-      - run: sbt ++${{ matrix.scala }} scalafmtCheckSbt
+      - run: sbt ++${{ matrix.scala }} scalafmtSbtCheck
 
   scalafix:
     name: Check code with scalafix
