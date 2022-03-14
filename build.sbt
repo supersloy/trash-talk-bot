@@ -1,15 +1,61 @@
-ThisBuild / scalaVersion := "2.13.8"
-ThisBuild / scapegoatVersion := "1.4.12"
-ThisBuild / semanticdbEnabled := true
-ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+ThisBuild / scalaVersion               := "2.13.8"
+ThisBuild / scapegoatVersion           := "1.4.12"
+ThisBuild / semanticdbEnabled          := true
+ThisBuild / semanticdbVersion          := scalafixSemanticdb.revision
 ThisBuild / scalafixScalaBinaryVersion := "2.13"
-scapegoatReports := Seq("xml")
+scapegoatReports                       := Seq("xml")
 
 val CatsVersion     = "3.3.5"
 val Http4sVersion   = "0.23.10"
 val CirceVersion    = "0.14.1"
 val Log4CatsVersion = "2.2.0"
 val DoobieVersion   = "1.0.0-RC1"
+
+val githubWorkflowScalas = List("2.13.8")
+
+val checkoutSetupJava = List(WorkflowStep.Checkout) ++
+  WorkflowStep.SetupJava(List(JavaSpec.temurin("11")))
+
+ThisBuild / githubWorkflowPublishTargetBranches := Seq()
+
+ThisBuild / githubWorkflowAddedJobs ++= Seq(
+  WorkflowJob(
+    id = "scalafmt",
+    name = "Format code with scalafmt",
+    scalas = githubWorkflowScalas,
+    steps = checkoutSetupJava ++
+      githubWorkflowGeneratedCacheSteps.value ++
+      List(
+        WorkflowStep.Sbt(List("scalafmtCheckAll")),
+        WorkflowStep.Sbt(List("scalafmtSbtCheck")),
+      ),
+  ),
+  WorkflowJob(
+    id = "scalafix",
+    name = "Check code with scalafix",
+    scalas = githubWorkflowScalas,
+    steps = checkoutSetupJava ++
+      githubWorkflowGeneratedCacheSteps.value ++
+      List(WorkflowStep.Sbt(List("scalafixAll --check"))),
+  ),
+  WorkflowJob(
+    id = "coverage",
+    name = "Upload coverage report to Codecov",
+    scalas = githubWorkflowScalas,
+    steps = checkoutSetupJava ++
+      githubWorkflowGeneratedCacheSteps.value ++
+      List(
+        WorkflowStep.Sbt(List("coverage", "test", "coverageReport")),
+        WorkflowStep.Run(
+          List(
+            "curl -Os https://uploader.codecov.io/latest/linux/codecov",
+            "chmod +x codecov",
+            "./codecov",
+          )
+        ),
+      ),
+  ),
+)
 
 lazy val trashtalkBot = project
   .in(file("."))

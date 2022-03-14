@@ -15,22 +15,20 @@ import org.http4s.implicits._
 import org.http4s.server._
 import doobie.implicits._
 
-
 class Server[F[_]: Async](xa: Transactor[F]) {
 
   def routes: HttpRoutes[F] = {
     val dsl = Http4sDsl[F]
     import dsl._
-    HttpRoutes.of[F] {
-      case GET -> Root / chatId =>
-        chatId.toLongOption
-          .map(id =>
-            for {
-              messages <- SQLCommands.getChatMessages(id).transact(xa)
-              response <- Ok(messages.asJson)
-            } yield response
-          )
-          .getOrElse(BadRequest(s"Chat with id \"$chatId\" does not exist"))
+    HttpRoutes.of[F] { case GET -> Root / chatId =>
+      chatId.toLongOption
+        .map(id =>
+          for {
+            messages <- SQLCommands.getChatMessages(id).transact(xa)
+            response <- Ok(messages.asJson)
+          } yield response
+        )
+        .getOrElse(BadRequest(s"Chat with id \"$chatId\" does not exist"))
 
     }
   }
