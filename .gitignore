@@ -3,8 +3,11 @@
 .bloop/
 .vscode/
 .metals/
+logs/
+.scannerwork/
 
 **/target/
 null/
 project/project/
 project/metals.sbt
+

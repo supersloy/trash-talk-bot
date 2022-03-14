@@ -1,7 +1,12 @@
 ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scapegoatVersion := "1.4.12"
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+ThisBuild / scalafixScalaBinaryVersion := "2.13"
+scapegoatReports := Seq("xml")
 
 val CatsVersion     = "3.3.5"
-val Http4sVersion   = "0.23.9"
+val Http4sVersion   = "0.23.10"
 val CirceVersion    = "0.14.1"
 val Log4CatsVersion = "2.2.0"
 val DoobieVersion   = "1.0.0-RC1"
@@ -21,6 +26,7 @@ lazy val trashtalkBot = project
       "org.http4s"    %% "http4s-circe"        % Http4sVersion,
       "org.typelevel" %% "cats-effect"         % CatsVersion,
       "org.typelevel" %% "log4cats-slf4j"      % Log4CatsVersion,
-      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.4.1",
-    ).map(_.cross(CrossVersion.for3Use2_13)),
+      "com.softwaremill.sttp.client3" %% "async-http-client-backend-cats" % "3.4.2",
+      "org.scalameta" %% "munit" % "1.0.0-M2" % Test,
+    ),
   )
