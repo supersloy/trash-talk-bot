@@ -1,4 +1,8 @@
-import org.trashtalk.bot.Schemas.MsgType
+import org.trashtalk.persistence.model.MsgType
+import org.trashtalk.persistence.repository.PostgresTelegramMessageRepository.{
+  fromEnum,
+  toEnum,
+}
 
 class MsgTypeTests extends munit.FunSuite {
   val msgTypeTestCases: Map[MsgType, String] = Map(
@@ -11,16 +15,16 @@ class MsgTypeTests extends munit.FunSuite {
 
   msgTypeTestCases.foreach { case (msgType, str) =>
     test(s"converts $msgType to string") {
-      assertEquals(MsgType.toEnum(msgType), str)
+      assertEquals(toEnum(msgType), str)
     }
 
     test(s"converts string to $msgType") {
-      assertEquals(MsgType.fromEnum(str), Some(msgType))
+      assertEquals(fromEnum(str), Some(msgType))
     }
   }
 
   test("MsgType.toEnum returns None when given an invalid string") {
-    assertEquals(MsgType.fromEnum("ABOBA"), None)
+    assertEquals(fromEnum("ABOBA"), None)
   }
 
 }
