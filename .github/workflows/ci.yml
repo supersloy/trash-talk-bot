@@ -98,6 +98,8 @@ jobs:
 
       - run: sbt ++${{ matrix.scala }} scalafmtCheckAll
 
+      - run: sbt ++${{ matrix.scala }} scalafmtCheckSbt
+
   scalafix:
     name: Check code with scalafix
     strategy:

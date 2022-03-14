@@ -25,7 +25,10 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
     scalas = githubWorkflowScalas,
     steps = checkoutSetupJava ++
       githubWorkflowGeneratedCacheSteps.value ++
-      List(WorkflowStep.Sbt(List("scalafmtCheckAll", "scalafmtSbtCheck"))),
+      List(
+        WorkflowStep.Sbt(List("scalafmtCheckAll")),
+        WorkflowStep.Sbt(List("scalafmtCheckSbt")),
+      ),
   ),
   WorkflowJob(
     id = "scalafix",
