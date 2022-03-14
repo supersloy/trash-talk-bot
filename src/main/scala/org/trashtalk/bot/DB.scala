@@ -41,9 +41,9 @@ object Schemas {
       pgEnumStringOpt("msg_type", MsgType.fromEnum, MsgType.toEnum)
   }
 
-  val msgTableName = "message"
+  val msgTableName: String = "message"
 
-  val chat =
+  val chat: Fragment =
     sql"""
        CREATE TABLE "chat"(
            "chat_id" bigint PRIMARY KEY
