@@ -2,11 +2,7 @@ package org.trashtalk.bot
 
 import cats.effect._
 import cats.syntax.all._
-import com.bot4s.telegram.api.declarative.{
-  Action,
-  CommandFilterMagnet,
-  Commands,
-}
+import com.bot4s.telegram.api.declarative.Commands
 import com.bot4s.telegram.cats.{Polling, TelegramBot}
 import com.bot4s.telegram.methods._
 import com.bot4s.telegram.models._
@@ -17,40 +13,34 @@ import sttp.client3.SttpBackend
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 
 class Bot[F[_]: Async](
-    token: String,
-    backend: SttpBackend[F, Any],
-    xa: Transactor[F],
-    telegramApi: String = "api.telegram.org",
+  token: String,
+  backend: SttpBackend[F, Any],
+  xa: Transactor[F],
+  telegramApi: String = "api.telegram.org",
 ) extends TelegramBot[F](token, backend, telegramApi)
-    with Polling[F]
-    with Commands[F] {
+  with Polling[F]
+  with Commands[F] {
 
-  onCommand("start") { implicit msg =>
-    request(SendMessage(msg.chat.chatId, "go fuck yourself")).void
-  }
-
-  def generateMessage(chat_id: Long): F[Unit] =
+  def generateMessage(chatId: Long): F[Unit] =
     SQLCommands
-      .getRandomMessage(chat_id)
+      .getRandomMessage(chatId)
       .transact(xa)
       .flatMap { list =>
         list.headOption match {
           case Some(msg) =>
             val content = msg.msgType match {
-              case MsgType.TEXT  => SendMessage(chat_id, msg.content)
-              case MsgType.IMAGE => SendPhoto(chat_id, InputFile(msg.content))
+              case MsgType.TEXT  => SendMessage(chatId, msg.content)
+              case MsgType.IMAGE => SendPhoto(chatId, InputFile(msg.content))
               case MsgType.STICKER =>
-                SendSticker(chat_id, InputFile(msg.content))
-              case MsgType.VIDEO => SendVideo(chat_id, InputFile(msg.content))
-              case MsgType.DOC => SendDocument(chat_id, InputFile(msg.content))
+                SendSticker(chatId, InputFile(msg.content))
+              case MsgType.VIDEO => SendVideo(chatId, InputFile(msg.content))
+              case MsgType.DOC   => SendDocument(chatId, InputFile(msg.content))
             }
             request(content).void
           case None =>
             ().pure[F]
         }
       }
-
-  //  def generateMessageGivenType(t: MsgType): F[Unit]
 
   override def receiveMessage(msg: Message): F[Unit] =
     for {
@@ -63,13 +53,6 @@ class Bot[F[_]: Async](
 
 object Bot extends IOApp {
 
-  import cats.effect._
-  import doobie.{Transactor, _}
-  import doobie.util.transactor._
-
-  val botClientBackend: IO[SttpBackend[IO, Any]] =
-    AsyncHttpClientCatsBackend[IO]()
-
   override def run(args: List[String]): IO[ExitCode] =
     for {
       token <- IO.fromOption(sys.env.get("TRASHTALK_TOKEN"))(
@@ -79,13 +62,7 @@ object Bot extends IOApp {
             " with your token value."
         )
       )
-      backend <- botClientBackend
-      dummy = Transactor[IO, Unit](
-        (),
-        _ => Resource.pure(null),
-        KleisliInterpreter[IO].ConnectionInterpreter,
-        Strategy.void,
-      )
+      backend <- AsyncHttpClientCatsBackend[IO]()
       xa <- IO.delay(
         Transactor.fromDriverManager[IO](
           driver = "org.postgresql.Driver",

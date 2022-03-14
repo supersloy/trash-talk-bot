@@ -10,18 +10,20 @@ import scala.collection.immutable.SortedMap
 
 object Schemas {
 
+  import MsgType._
+
   sealed trait MsgType
 
   object MsgType {
-    case object TEXT extends MsgType
+    final case object TEXT extends MsgType
 
-    case object IMAGE extends MsgType
+    final case object IMAGE extends MsgType
 
-    case object STICKER extends MsgType
+    final case object STICKER extends MsgType
 
-    case object VIDEO extends MsgType
+    final case object VIDEO extends MsgType
 
-    case object DOC extends MsgType
+    final case object DOC extends MsgType
 
     private val mapping = SortedMap(
       "TEXT"    -> TEXT,
@@ -31,7 +33,7 @@ object Schemas {
       "DOC"     -> DOC,
     )
 
-    val msg_types: List[MsgType] = mapping.values.toList
+    val msgTypes: List[MsgType]    = mapping.values.toList
     def toEnum(e: MsgType): String = e.toString
 
     def fromEnum(s: String): Option[MsgType] = mapping.get(s)
@@ -39,9 +41,7 @@ object Schemas {
       pgEnumStringOpt("msg_type", MsgType.fromEnum, MsgType.toEnum)
   }
 
-  import MsgType._
-
-  val msg_table_name = "message"
+  val msgTableName = "message"
 
   val chat =
     sql"""
@@ -52,9 +52,9 @@ object Schemas {
 
   val message: Fragment =
     fr"""CREATE TYPE msg_type AS ENUM""" ++
-      Fragment.const(msg_types.map(t => s"'$t'").mkString("(", ", ", ")")) ++
+      Fragment.const(msgTypes.map(t => s"'$t'").mkString("(", ", ", ")")) ++
       fr""";
-          |CREATE TABLE """.stripMargin ++ Fragment.const(msg_table_name) ++
+          |CREATE TABLE """.stripMargin ++ Fragment.const(msgTableName) ++
       fr"""(
           |"chat_id" bigint REFERENCES "chat"("chat_id"),
           |"message_id" bigint NOT NULL,
@@ -64,34 +64,34 @@ object Schemas {
           |);
       """.stripMargin
 
-  val admin_relation: Fragment =
+  val adminRelation: Fragment =
     sql"""
-         |CREATE TABLE "admin_relation" (
-         |"chat_id" bigint NOT NULL,
-         |"admin_id" bigint NOT NULL,
-         | FOREIGN KEY (chat_id) REFERENCES "chat"("chat_id"),
-         | FOREIGN KEY (admin_id) REFERENCES "admin"("user_id")
-         |);
+    |CREATE TABLE "admin_relation" (
+    |"chat_id" bigint NOT NULL,
+    |"admin_id" bigint NOT NULL,
+    | FOREIGN KEY (chat_id) REFERENCES "chat"("chat_id"),
+    | FOREIGN KEY (admin_id) REFERENCES "admin"("user_id")
+    |);
          """.stripMargin
 
   val admin: Fragment =
     sql"""
-         |CREATE TABLE "admin" (
-         |  "user_id" bigint NOT NULL,
-         |  PRIMARY KEY ("user_id")
-         |);
-         """.stripMargin
+    |CREATE TABLE "admin" (
+    |  "user_id" bigint NOT NULL,
+    |  PRIMARY KEY ("user_id")
+    |);
+       """.stripMargin
 }
 
 object SQLCommands {
 
   import org.trashtalk.bot.Schemas._
 
-  case class DBMessage(
-      chatId: Long,
-      messageId: Long,
-      msgType: MsgType,
-      content: String,
+  final case class DBMessage(
+    chatId: Long,
+    messageId: Long,
+    msgType: MsgType,
+    content: String,
   )
 
   object DBMessage {
@@ -121,13 +121,19 @@ object SQLCommands {
   val createTables: ConnectionIO[Int] = (
     chat ++
       message
-      ++ admin ++ admin_relation
+      ++ admin ++ adminRelation
   ).update.run
 
-  def getRandomMessage(source_id: Long): ConnectionIO[List[DBMessage]] =
+  def getChatMessages(chatId: Long): ConnectionIO[List[DBMessage]] =
     sql"""
       SELECT chat_id, message_id, type, content FROM message
-      WHERE chat_id = $source_id
+      WHERE chat_id = $chatId
+       """.query[DBMessage].to[List]
+
+  def getRandomMessage(chatId: Long): ConnectionIO[List[DBMessage]] =
+    sql"""
+      SELECT chat_id, message_id, type, content FROM message
+      WHERE chat_id = $chatId
       ORDER BY RANDOM()
       LIMIT 1
        """.query[DBMessage].to[List]
@@ -148,10 +154,11 @@ object SQLCommands {
 }
 
 object DBConnect {
+  import SQLCommands._
+  import cats.effect.IO
+  import cats.effect.unsafe.implicits.global
+
   def main(args: Array[String]): Unit = {
-    import SQLCommands._
-    import cats.effect.IO
-    import cats.effect.unsafe.implicits.global
 
     val transactor = Transactor.fromDriverManager[IO](
       driver = "org.postgresql.Driver",
