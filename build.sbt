@@ -51,8 +51,8 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
     UseRef.Public("actions", "setup-node", "v3.0.0"),
     params = Map(
-      "node-version"          -> "'lts/gallium'",
-      "cache"                 -> "'npm'",
+      "node-version"          -> "lts/gallium",
+      "cache"                 -> "npm",
       "cache-dependency-path" -> "frontend/package-lock.json",
     ),
   ),
