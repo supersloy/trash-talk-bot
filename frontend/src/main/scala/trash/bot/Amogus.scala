@@ -16,6 +16,6 @@ trait ConsoleAmogus extends js.Object {
 }
 
 object ConsoleAmogus extends js.Object {
-  implicit def console2amogus(console: dom.Console): ConsoleAmogus = 
+  implicit def console2amogus(console: dom.Console): ConsoleAmogus =
     console.asInstanceOf[ConsoleAmogus]
 }
