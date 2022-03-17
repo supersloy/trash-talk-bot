@@ -34,11 +34,13 @@ class PostgresTelegramMessageRepository[F[_]: MonadCancelThrow](
       .from(msg)
       .map { m =>
         val updateChat = sql"""
-           INSERT INTO chat (chat_id) values (${m.chatId}) ON CONFLICT DO NOTHING;
-         """.update.run
+          INSERT INTO chat (chat_id) values (${m.chatId}) ON CONFLICT DO NOTHING;
+        """.update.run
 
-        val updateMessages =
-          sql"""insert into message (message_id, chat_id, content, type) values (${m.messageId}, ${m.chatId}, ${m.content}, ${m.msgType.toString}::msg_type);""".update.run.void
+        val updateMessages = sql"""
+          INSERT INTO message (message_id, chat_id, content, type) 
+          VALUES (${m.messageId}, ${m.chatId}, ${m.content}, ${m.msgType.toString}::msg_type);
+        """.update.run.void
 
         (updateChat *> updateMessages)
           .transact(xa)

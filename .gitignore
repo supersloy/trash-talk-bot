@@ -1,3 +1,4 @@
+# IDE stuff
 .bsp/
 .idea/
 .bloop/
@@ -6,8 +7,10 @@
 logs/
 .scannerwork/
 
+# Artifacts
 **/target/
 null/
 project/project/
 project/metals.sbt
-
+node_modules/
+dist/
