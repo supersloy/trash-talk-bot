@@ -44,6 +44,33 @@ val checkoutSetupJava = List(WorkflowStep.Checkout) ++
 
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("nanasess", "setup-chromedriver", "v1.0.1")
+  ),
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v3.0.0"),
+    params = Map(
+      "node-version"          -> "'lts/gallium'",
+      "cache"                 -> "'npm'",
+      "cache-dependency-path" -> "frontend/package-lock.json",
+    ),
+  ),
+)
+
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Run(
+    List(
+      """cd frontend && \
+         npm install && \
+         { npx vite -l silent --clearScreen false & } && \
+         cd ..  && \
+         sbt ++${{ matrix.scala }} test && \
+         kill $(jobs -p)"""
+    )
+  )
+)
+
 ThisBuild / githubWorkflowAddedJobs ++= Seq(
   WorkflowJob(
     id = "scalafmt",
@@ -71,7 +98,11 @@ ThisBuild / githubWorkflowAddedJobs ++= Seq(
     steps = checkoutSetupJava ++
       githubWorkflowGeneratedCacheSteps.value ++
       List(
-        WorkflowStep.Sbt(List("coverage", "test", "coverageReport")),
+        // TODO: For now, coverage is collected only from 'bot' subproject.
+        //       Figure out how to setup sbt-scoverage with scala-js (probably unreal)
+        WorkflowStep.Sbt(
+          List("project bot", "coverage", "test", "coverageReport")
+        ),
         WorkflowStep.Run(
           List(
             "curl -Os https://uploader.codecov.io/latest/linux/codecov",

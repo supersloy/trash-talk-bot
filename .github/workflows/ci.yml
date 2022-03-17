@@ -50,14 +50,27 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
+      - uses: nanasess/setup-chromedriver@v1.0.1
+
+      - uses: actions/setup-node@v3.0.0
+        with:
+          node-version: '''lts/gallium'''
+          cache: '''npm'''
+          cache-dependency-path: frontend/package-lock.json
+
       - name: Check that workflows are up to date
         run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
-      - name: Build project
-        run: sbt ++${{ matrix.scala }} test
+      - run: |
+          cd frontend && \
+                   npm install && \
+                   { npx vite -l silent --clearScreen false & } && \
+                   cd ..  && \
+                   sbt ++${{ matrix.scala }} test && \
+                   kill $(jobs -p)
 
       - name: Compress target directories
-        run: tar cf targets.tar target project/target
+        run: tar cf targets.tar target bot/target frontend/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
@@ -164,7 +177,7 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
-      - run: sbt ++${{ matrix.scala }} coverage test coverageReport
+      - run: sbt ++${{ matrix.scala }} 'project bot' coverage test coverageReport
 
       - run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
