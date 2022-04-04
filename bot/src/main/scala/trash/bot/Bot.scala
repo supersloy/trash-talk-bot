@@ -1,4 +1,4 @@
-package org.trashtalk.bot
+package trash.bot
 
 import cats.effect._
 import cats.syntax.all._
@@ -7,9 +7,9 @@ import com.bot4s.telegram.cats.{Polling, TelegramBot}
 import com.bot4s.telegram.methods._
 import com.bot4s.telegram.models._
 import doobie.implicits._
-import org.trashtalk.persistence.model.MsgType
 import sttp.client3.SttpBackend
-import org.trashtalk.persistence.repository.TelegramMessageRepository
+import trash.persistence.model.MsgType
+import trash.persistence.repository.TelegramMessageRepository
 
 class Bot[F[_]: Async](
   token: String,

@@ -1,10 +1,10 @@
-package trash.bot
+package trash.frontend
 
 import slinky.web.html._
 import slinky.core.facade.Hooks._
 import slinky.core.{FunctionalComponent, SyntheticEvent}
-import trash.bot.ChatFind.ChatFindProps
-import trash.bot.MessageList.MessageListProps
+import trash.frontend.ChatFind.ChatFindProps
+import trash.frontend.MessageList.MessageListProps
 
 object App {
   private val css = Css.App

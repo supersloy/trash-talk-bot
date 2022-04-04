@@ -1,4 +1,4 @@
-package trash.bot
+package trash.frontend
 import scalajs.js
 import org.scalajs.dom
 

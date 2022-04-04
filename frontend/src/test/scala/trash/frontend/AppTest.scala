@@ -1,8 +1,8 @@
-package trash.bot
+package trash.frontend
 
 import slinky.web.ReactDOM
 import org.scalajs.dom.document
-import trash.bot.App.App
+import trash.frontend.App.App
 import scalajs.js
 
 class AppTest extends munit.FunSuite {

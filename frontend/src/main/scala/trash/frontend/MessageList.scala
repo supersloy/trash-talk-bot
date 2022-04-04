@@ -1,4 +1,4 @@
-package trash.bot
+package trash.frontend
 
 import slinky.core.FunctionalComponent
 import slinky.core.facade.Hooks.useEffect

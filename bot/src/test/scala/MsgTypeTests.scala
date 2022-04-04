@@ -1,5 +1,5 @@
-import org.trashtalk.persistence.model.MsgType
-import org.trashtalk.persistence.repository.PostgresTelegramMessageRepository.{
+import trash.persistence.model.MsgType
+import trash.persistence.repository.postgres.PostgresTelegramMessageRepository.{
   fromEnum,
   toEnum,
 }

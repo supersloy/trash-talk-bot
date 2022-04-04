@@ -1,4 +1,4 @@
-package org.trashtalk.persistence.repository
+package trash.persistence.repository.postgres
 
 import org.trashtalk.persistence.model._
 import com.bot4s.telegram.models.Message
@@ -10,6 +10,8 @@ import doobie.postgres.implicits._
 import PostgresTelegramMessageRepository._
 import cats.syntax.all._
 import cats._
+import trash.persistence.model.{DBMessage, MsgType}
+import trash.persistence.repository.TelegramMessageRepository
 
 class PostgresTelegramMessageRepository[F[_]: MonadCancelThrow](
   xa: Transactor[F]

@@ -1,4 +1,4 @@
-package trash.bot
+package trash.frontend
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.scalajs.LinkingInfo

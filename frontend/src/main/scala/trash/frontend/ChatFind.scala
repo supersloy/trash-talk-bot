@@ -1,4 +1,4 @@
-package trash.bot
+package trash.frontend
 
 import org.scalajs.dom.Event
 import org.scalajs.dom.html.Input

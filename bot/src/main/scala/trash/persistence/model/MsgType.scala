@@ -1,4 +1,5 @@
-package org.trashtalk.persistence.model
+package trash.persistence.model
+
 import scala.collection.immutable.SortedMap
 
 sealed trait MsgType

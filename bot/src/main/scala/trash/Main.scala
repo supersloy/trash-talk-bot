@@ -1,10 +1,11 @@
-package org.trashtalk
+package trash
+
 import cats.effect._
 import cats.syntax.all._
-import org.trashtalk.persistence.repository.PostgresTelegramMessageRepository
 import sttp.client3.asynchttpclient.cats.AsyncHttpClientCatsBackend
 import doobie.util.transactor.Transactor
-import org.trashtalk.bot.Bot
+import trash.bot.Bot
+import trash.persistence.repository.postgres.PostgresTelegramMessageRepository
 
 object Main extends IOApp {
 
