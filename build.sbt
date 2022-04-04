@@ -30,7 +30,11 @@ def seleniumConfig(
     .withMaterializeInServer(
       testJsDir.getAbsolutePath, {
         val path =
-          s"http://localhost:$port/${testJsDir.relativeTo(baseDir).get}/"
+          s"http://localhost:$port/${testJsDir
+              .relativeTo(baseDir)
+              .get
+              .toString
+              .replace("\\", "/")}/"
         println(path)
         path
       },
