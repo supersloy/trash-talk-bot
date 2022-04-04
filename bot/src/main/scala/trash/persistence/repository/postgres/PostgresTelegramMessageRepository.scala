@@ -1,6 +1,5 @@
 package trash.persistence.repository.postgres
 
-import org.trashtalk.persistence.model._
 import com.bot4s.telegram.models.Message
 import cats.effect.kernel.MonadCancelThrow
 import doobie.util.transactor.Transactor
