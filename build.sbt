@@ -141,6 +141,7 @@ lazy val bot = project
 lazy val frontend = project
   .in(file("frontend"))
   .enablePlugins(ScalaJSPlugin)
+  .settings(Compiler.settings)
   .settings(
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= {

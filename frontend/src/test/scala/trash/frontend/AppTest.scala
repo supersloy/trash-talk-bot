@@ -8,13 +8,13 @@ import scalajs.js
 class AppTest extends munit.FunSuite {
   test("Renders without crashing") {
     val div = document.createElement("div")
-    ReactDOM.render(App(), div)
+    ReactDOM.render(App(()), div)
     ReactDOM.unmountComponentAtNode(div)
   }
 
   test("Button has text") {
     val root = document.createElement("div")
-    ReactDOM.render(App(), root)
+    ReactDOM.render(App(()), root)
     val buttonText = root.getElementsByClassName("button-6").lift(0)
 
     buttonText match {

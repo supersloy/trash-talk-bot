@@ -13,6 +13,7 @@ object Compiler {
      * explicitly. */
     "-unchecked", // Enable additional warnings where generated code depends on assumptions.
     "-Xfatal-warnings", // Fail the compilation if there are any warnings.
+    "-language:implicitConversions", // Enable implicit conversions
   )
 
   val settings = Seq(
